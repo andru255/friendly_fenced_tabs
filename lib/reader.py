@@ -11,13 +11,13 @@ from collections import OrderedDict as odict
 KWARGS_REGEXES = odict((
     ('friendly_params', re.compile(r'''
         friendly_params=(?P<quot>"|')(?P<friendly_params>.*?)(?P=quot)
-        ''')),
+        ''', re.VERBOSE)),
     ('friendly_title', re.compile(r'''
         friendly_title=(?P<quot>"|')(?P<friendly_title>.*?)(?P=quot)
-        '''))
+        ''', re.VERBOSE))
 ))
 
-class Translator:
+class Reader:
     def match(self, content):
         clean_content = self._filter_content(content)
         block_regex = re.compile(r'''
@@ -25,11 +25,14 @@ class Translator:
          (?P<fence>
             ^(?:~{3,}|`{3,}))[ ]*
 
-         # Checking the language defined
+         # Check the language defined
          (\{?\.?(?P<language>[\w#.+-]*))?[ ]*
 
-         # Optional friend title, single- or double-quote-delimited
-         (friendly_title=(?P<fct_quot>"|')(?P<fence_title>.*?)(?P=fct_quot))?[ ]*
+         # Optional friendly title, single- or double-quote-delimited
+         (friendly_title=(?P<fct_quot>"|')(?P<friendly_title>.*?)(?P=fct_quot))?[ ]*
+
+         # Optional closing }
+         }?[ ]*\n 
 
          # checking the body
          (?P<code>.*?)(?<=\n)
@@ -47,19 +50,6 @@ class Translator:
                 print ValueError
         return kwargs
 
-    def _filter_param_to_kwargs(self, param, content, kwargs):
-        result_kwargs = {}
-        if kwargs:
-            result_kwargs = kwargs
-        if content:
-            if content.group(param):
-                result_kwargs[param] = content.group(param)
-            elif (not content.group(param) is None) and param in PARAM_DEFAULTS:
-                result_kwargs[param] = PARAM_DEFAULTS(param)
-            else:
-                raise Exception('{} needs an argument within in \n {}'.format(param, content))
-        return result_kwargs
-
     def _filter_content(self, content):
         string_block = content.replace(u'\u2018', '&lsquo;') #‘
         string_block = string_block.replace(u'\u2019', '&rsquo;') #’
@@ -74,3 +64,16 @@ class Translator:
             string_block = content
 
         return string_block
+
+    def _filter_param_to_kwargs(self, param, content, kwargs):
+        result_kwargs = {}
+        if kwargs:
+            result_kwargs = kwargs
+        if content:
+            if content.group(param):
+                result_kwargs[param] = content.group(param)
+            elif (not content.group(param) is None) and param in PARAM_DEFAULTS:
+                result_kwargs[param] = PARAM_DEFAULTS(param)
+            else:
+                raise Exception('{} needs an argument within in \n {}'.format(param, content))
+        return result_kwargs

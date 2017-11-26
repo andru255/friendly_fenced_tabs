@@ -1,8 +1,5 @@
-import lib
 import unittest
-from utils import Utils
+from reader import TestReader
 
-class TestReader(unittest.TestCase):
-    def test_reader__match(self):
-        expected = ":D"
-        self.assertEqual(":D", expected)
+suite = unittest.TestLoader().loadTestsFromTestCase(TestReader)
+unittest.TextTestRunner(verbosity=2).run(suite)
