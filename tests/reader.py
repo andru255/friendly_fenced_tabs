@@ -17,7 +17,7 @@ class TestReader(unittest.TestCase):
             'fence': u'```',
             'language': u''
         }
-        fixture = Utils.get_str_from_content('fixtures/block.md')
+        fixture = Utils.get_str_from_content('fixtures/block-default.md')
         result_match = objReader.match(fixture)
         output = result_match.groupdict()
         self.assertEqual(output, expected)

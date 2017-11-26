@@ -14,11 +14,29 @@ KWARGS_REGEXES = odict((
         ''', re.VERBOSE)),
     ('friendly_title', re.compile(r'''
         friendly_title=(?P<quot>"|')(?P<friendly_title>.*?)(?P=quot)
+        ''', re.VERBOSE)),
+    ('friendly_no_title', re.compile(r'''
+        friendly_no_title=(?P<quot>"|')(?P<friendly_no_title>.*?)(?P=quot)
         ''', re.VERBOSE))
 ))
 
-class Reader:
+class Reader(object):
+    '''
+        That class only focus to analyze a text and get useful content
+        to assemble the final output
+    '''
+    def __init__(self, **kwargs):
+        ''' nothing to initialize at the moment'''
+
+    def match_fenced_symbol(self, content):
+        clean_content = self._filter_content(content)
+        block_regex = re.compile(r'''
+          (?P<fence>^(?:~{3,}|`{3,}))[ ]*
+        ''', re.VERBOSE)
+        return block_regex.search(clean_content)
+
     def match(self, content):
+        ''' return a match by a string content'''
         clean_content = self._filter_content(content)
         block_regex = re.compile(r'''
         # Opening ``` or ~~~
@@ -41,6 +59,9 @@ class Reader:
         return block_regex.search(clean_content)
 
     def kwargs_from_content(self, content):
+        ''' returns the settings defined by a block of content
+            Only detects 'friendly_title', 'friendly_no_title', 'friendly_params'
+        '''
         kwargs = {}
         for param, regex in KWARGS_REGEXES.items():
             param_match = regex.search(content)
@@ -72,8 +93,6 @@ class Reader:
         if content:
             if content.group(param):
                 result_kwargs[param] = content.group(param)
-            elif (not content.group(param) is None) and param in PARAM_DEFAULTS:
-                result_kwargs[param] = PARAM_DEFAULTS(param)
             else:
                 raise Exception('{} needs an argument within in \n {}'.format(param, content))
         return result_kwargs
