@@ -6,28 +6,12 @@
 '''
 
 import re
-from collections import OrderedDict as odict
-
-KWARGS_REGEXES = odict((
-    ('friendly_params', re.compile(r'''
-        friendly_params=(?P<quot>"|')(?P<friendly_params>.*?)(?P=quot)
-        ''', re.VERBOSE)),
-    ('friendly_title', re.compile(r'''
-        friendly_title=(?P<quot>"|')(?P<friendly_title>.*?)(?P=quot)
-        ''', re.VERBOSE)),
-    ('friendly_no_title', re.compile(r'''
-        friendly_no_title=(?P<quot>"|')(?P<friendly_no_title>.*?)(?P=quot)
-        ''', re.VERBOSE))
-))
 
 class Reader(object):
     '''
         That class only focus to analyze a text and get useful content
         to assemble the final output
     '''
-    def __init__(self, **kwargs):
-        ''' nothing to initialize at the moment'''
-
     def match_fenced_symbol(self, content):
         clean_content = self._filter_content(content)
         block_regex = re.compile(r'''
@@ -37,39 +21,57 @@ class Reader(object):
 
     def match(self, content):
         ''' return a match by a string content'''
-        clean_content = self._filter_content(content)
-        block_regex = re.compile(r'''
-        # Opening ``` or ~~~
-         (?P<fence>
-            ^(?:~{3,}|`{3,}))[ ]*
+        data = {
+            'language': self.match_language(content),
+            'options': self.match_options(content),
+            'code': self.match_code_content(content)
+        }
+        return data
 
-         # Check the language defined
-         (\{?\.?(?P<language>[\w#.+-]*))?[ ]*
-
-         # Optional friendly title, single- or double-quote-delimited
-         (friendly_title=(?P<fct_quot>"|')(?P<friendly_title>.*?)(?P=fct_quot))?[ ]*
-
-         # Optional closing }
-         }?[ ]*\n 
-
-         # checking the body
-         (?P<code>.*?)(?<=\n)
-         (?P=fence)[ ]*$
-        ''', re.MULTILINE | re.DOTALL | re.VERBOSE)
-        return block_regex.search(clean_content)
-
-    def kwargs_from_content(self, content):
-        ''' returns the settings defined by a block of content
-            Only detects 'friendly_title', 'friendly_no_title', 'friendly_params'
+    def match_language(self, content):
+        result = None
+        str_regex = r'''
+            (?P<fence>^(?:~{3,}|`{3,}))[ ]*
+            (\{?\.?(?P<language>[\w#.+-]+)[^\w\=])?
         '''
-        kwargs = {}
-        for param, regex in KWARGS_REGEXES.items():
-            param_match = regex.search(content)
-            try:
-                kwargs = self._filter_param_to_kwargs(param, param_match, kwargs)
-            except ValueError:
-                print ValueError
-        return kwargs
+        clean_content = self._filter_content(content)
+        block_regex = re.compile(str_regex, re.VERBOSE)
+        match = block_regex.search(clean_content)
+        if match:
+            result = match.groupdict()['language']
+        return result
+
+    def match_options(self, content):
+        result = []
+        str_regex = r'''
+            (?P<key_name>\w*)=(?P<quot>['|"]?)(?P<value>[\w\d,\. ]+)?(?P=quot)[ ]?
+        '''
+        clean_content = self._filter_content(content)
+        block_regex = re.compile(str_regex, re.VERBOSE)
+        for match in re.finditer(block_regex, clean_content):
+            if match:
+                result.append(match.groupdict())
+        return result
+
+    def match_code_content(self, content):
+        result = None
+        str_regex = r'''
+             # Opening ``` or ~~~
+            (?P<fence>^(?:~{3,}|`{3,}))[ ]*
+             # Optional {, and lang
+            (\{?\.?[\w#.+-]*)?[ ]*
+             # options
+            (\w*=(?P<fct_quot>[ "|' ]?).*?(?P=fct_quot))?[ ]*
+            \}?[ ]*\n
+            (?P<code>.*?)(?<=\n)
+            (?P=fence)[ ]*$
+        '''
+        clean_content = self._filter_content(content)
+        block_regex = re.compile(str_regex, re.MULTILINE| re.DOTALL | re.VERBOSE)
+        match = block_regex.search(clean_content)
+        if match:
+            result = match.groupdict()['code']
+        return result
 
     def _filter_content(self, content):
         string_block = content.replace(u'\u2018', '&lsquo;') #‘
@@ -85,14 +87,3 @@ class Reader(object):
             string_block = content
 
         return string_block
-
-    def _filter_param_to_kwargs(self, param, content, kwargs):
-        result_kwargs = {}
-        if kwargs:
-            result_kwargs = kwargs
-        if content:
-            if content.group(param):
-                result_kwargs[param] = content.group(param)
-            else:
-                raise Exception('{} needs an argument within in \n {}'.format(param, content))
-        return result_kwargs

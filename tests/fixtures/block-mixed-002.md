@@ -53,8 +53,9 @@ foo="bar"
 
 
 # pe
-```
-foo="bar"
+
+```sh friendly_title="bash" hl_lines="1 3"
+echo "zxxxx"
 ```
 ```
 foo="bar"

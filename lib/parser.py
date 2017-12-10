@@ -3,6 +3,7 @@
 
 import re
 from datetime import datetime
+from utils import Utils
 
 class Parser(object):
     def generate_node(self, token):
@@ -14,13 +15,14 @@ class Parser(object):
             title = language
 
         # if 'friendly_title' exists on token
-        if 'friendly_title' in token:
-            friendly_title = token['friendly_title']
-            if friendly_title:
-                title = friendly_title
+        options = token['options']
+        friendly_title = Utils.get_value_by_key_name(options, 'friendly_title')
+        if friendly_title:
+            title = friendly_title
         
         # body scaped content
-        scaped_body = self._escape(token['code'])
+        code = token['code']
+        scaped_body = self._escape(code)
         title_value =  self._format_title(title)
 
         data = {

@@ -51,25 +51,19 @@ class FriendlyPreprocessor(Preprocessor):
         tab_headers = ""
         tab_contents = ""
         for tab in tab_recollector.with_tabs(line):
-            match = reader.match(tab['content'])
-            if match:
-                tab_config = reader.kwargs_from_content(tab['content'])
-                token = match.groupdict()
-                tab_node = parser.generate_node(token)
-                tab_headers += self.compiler.header_output(tab_config, tab_node)
-                tab_contents += self.compiler.content_output(tab_config, tab_node)
-                tab_html = self.compiler.compile(tab_headers, tab_contents)
-                yield tab_html
+            token = reader.match(tab['content'])
+            tab_node = parser.generate_node(token)
+            tab_headers += self.compiler.header_output(tab_node, token['options'])
+            tab_contents += self.compiler.content_output(tab_node, token['options'])
+            tab_html = self.compiler.compile(tab_headers, tab_contents)
+            yield tab_html
 
     def _get_html_group_one_tab(self, line):
         for tab in tab_recollector.with_tabs(line):
-            match = reader.match(tab['content'])
-            if match:
-                tab_config = reader.kwargs_from_content(tab['content'])
-                token = match.groupdict()
-                tab_node = parser.generate_node(token)
-                tab_html = self.compiler.compile_one_tab(tab_config, tab_node)
-                yield tab_html
+            token = reader.match(tab['content'])
+            tab_node = parser.generate_node(token)
+            tab_html = self.compiler.compile_one_tab(tab_node, token['options'])
+            yield tab_html
 
     def run(self, lines):
         #prepare the config

@@ -16,3 +16,11 @@ class Utils:
     def get_current_path():
         current_path = os.getcwd()
         return current_path
+    
+    @staticmethod
+    def get_value_by_key_name(dict_options, key_name):
+        result = ""
+        for option in dict_options:
+            if option['key_name'] == key_name:
+                result = option['value']
+        return result

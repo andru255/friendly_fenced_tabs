@@ -2,9 +2,7 @@ import lib
 import unittest
 from utils import Utils
 
-pwd = Utils.get_current_path(__file__)
 parser = lib.Parser()
-
 class TestParser(unittest.TestCase):
     def setUp(self):
         "nothing here at the moment"

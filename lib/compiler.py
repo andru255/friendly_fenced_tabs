@@ -1,3 +1,5 @@
+from utils import Utils
+
 class Compiler(object):
     def __init__(self, settings, extra_extensions):
         self.settings = settings
@@ -6,19 +8,25 @@ class Compiler(object):
     def update_settings(self, key, value):
         self.settings[key] = value
 
-    def header_output(self, tab_config, tab_node):
+    def header_output(self, tab_node, tab_options):
         #header
         header = self.settings['template_header_item'].format(
             **tab_node
         ) 
         return header
 
-    def content_output(self, tab_config, tab_node):
+    def content_output(self, tab_node, tab_options):
         template = self.settings['template_content_item']
 
         #if exists the codehilite config
         if 'codehilite_config' in self.settings:
             codehilite_config = self.settings['codehilite_config']
+
+            hl_lines = []
+            value_hl_lines = Utils.get_value_by_key_name(tab_options, 'hl_lines')
+            if value_hl_lines:
+                hl_lines = value_hl_lines
+
             highlighter =  self.extensions['Codehilite'](
                 tab_node['code'],
                 linenums=codehilite_config['linenums'][0],
@@ -26,13 +34,15 @@ class Compiler(object):
                 css_class=codehilite_config['css_class'][0],
                 style=codehilite_config['pygments_style'][0],
                 lang=(tab_node['language'] or None),
-                noclasses=codehilite_config['noclasses'][0]
+                noclasses=codehilite_config['noclasses'][0],
+                hl_lines=self.extensions['parse_hl_lines'](hl_lines)
             ) 
             tab_node['code'] = highlighter.hilite()
-        
-        content = template.format(
-            **tab_node
-        ) 
+            content = '{code}'.format(**tab_node)
+        else:
+            content = template.format(
+                **tab_node
+            ) 
         return content
 
     def compile(self, headers, contents):
@@ -50,12 +60,12 @@ class Compiler(object):
         )
         return result
 
-    def compile_one_tab(self, tab_config, tab_node):
+    def compile_one_tab(self, tab_node, tab_options):
         result = self.settings['template_block_no_tab'].format(
             **tab_node
         )
         if self.settings['single_block_as_tab']:
-            headers = self.header_output(tab_config, tab_node)
-            content = self.content_output(tab_config, tab_node)
+            headers = self.header_output(tab_node, tab_options)
+            content = self.content_output(tab_node, tab_options)
             result = self.compile(headers, content)
         return result
