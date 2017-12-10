@@ -7,11 +7,14 @@ Fenced code tabs extension for python markdown
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-from collections import deque
 from markdown.extensions import Extension
+from markdown.preprocessors import Preprocessor
+
+from markdown.extensions.codehilite import CodeHilite, CodeHiliteExtension
+from markdown.extensions.codehilite import parse_hl_lines
+
 import lib
 from utils import Utils
-from markdown.preprocessors import Preprocessor
 
 reader = lib.Reader()
 parser = lib.Parser()
@@ -32,11 +35,17 @@ class FriendlyPreprocessor(Preprocessor):
             'template_content_item'     : Utils.get_str_from_content('template/default_content_item.html'),
             'template_block_no_tab'     : Utils.get_str_from_content('template/default_block_no_tab.html')
         }
-        self.compiler = lib.Compiler(default_config)
+        self.compiler = lib.Compiler(default_config, {
+            'Codehilite'    : CodeHilite,
+            'parse_hl_lines': parse_hl_lines
+        })
         super(FriendlyPreprocessor, self).__init__(md)
 
-    def _check_Extension(self, extensions):
-        pass
+    def _check_Codehilite(self):
+       for ext in self.markdown.registeredExtensions:
+           if isinstance(ext, CodeHiliteExtension):
+               yield ext.config
+               break
 
     def _get_html_group_tabs(self, line):
         tab_headers = ""
@@ -63,6 +72,11 @@ class FriendlyPreprocessor(Preprocessor):
                 yield tab_html
 
     def run(self, lines):
+        #prepare the config
+        for config in self._check_Codehilite():
+            self.compiler.update_settings('codehilite_config', config)
+
+        #preprocessing the lines
         lines_with_tabs = tab_recollector.get_lines_with_tabs(lines, reader)
         for index, line in enumerate( lines_with_tabs ):
             if isinstance( line , list):

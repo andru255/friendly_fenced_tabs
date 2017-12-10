@@ -1,6 +1,10 @@
 class Compiler(object):
-    def __init__(self, settings):
+    def __init__(self, settings, extra_extensions):
         self.settings = settings
+        self.extensions = extra_extensions
+
+    def update_settings(self, key, value):
+        self.settings[key] = value
 
     def header_output(self, tab_config, tab_node):
         #header
@@ -11,6 +15,21 @@ class Compiler(object):
 
     def content_output(self, tab_config, tab_node):
         template = self.settings['template_content_item']
+
+        #if exists the codehilite config
+        if 'codehilite_config' in self.settings:
+            codehilite_config = self.settings['codehilite_config']
+            highlighter =  self.extensions['Codehilite'](
+                tab_node['code'],
+                linenums=codehilite_config['linenums'][0],
+                guess_lang=codehilite_config['guess_lang'][0],
+                css_class=codehilite_config['css_class'][0],
+                style=codehilite_config['pygments_style'][0],
+                lang=(tab_node['language'] or None),
+                noclasses=codehilite_config['noclasses'][0]
+            ) 
+            tab_node['code'] = highlighter.hilite()
+        
         content = template.format(
             **tab_node
         ) 
