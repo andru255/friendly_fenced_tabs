@@ -25,19 +25,9 @@ class FriendlyPreprocessor(Preprocessor):
     Class for process content from markdown
     '''
     def __init__(self, md, extension_config=None):
-        self.extension_config = extension_config
-        default_config = {
-            'single_block_as_tab'       : self.extension_config['single_block_as_tab'],
-            'template_container'        : Utils.get_str_from_content('template/default_container.html'),
-            'template_header_container' : Utils.get_str_from_content('template/default_header_container.html'),
-            'template_header_item'      : Utils.get_str_from_content('template/default_header_item.html'),
-            'template_content_container': Utils.get_str_from_content('template/default_content_container.html'),
-            'template_content_item'     : Utils.get_str_from_content('template/default_content_item.html'),
-            'template_block_no_tab'     : Utils.get_str_from_content('template/default_block_no_tab.html')
-        }
-        self.compiler = lib.Compiler(default_config, {
-            'Codehilite'    : CodeHilite,
-            'parse_hl_lines': parse_hl_lines
+        self.compiler = lib.Compiler(extension_config, extra_extensions={
+            'Codehilite'     : CodeHilite,
+            'parse_hl_lines' : parse_hl_lines
         })
         super(FriendlyPreprocessor, self).__init__(md)
 
@@ -50,18 +40,22 @@ class FriendlyPreprocessor(Preprocessor):
     def _get_html_group_tabs(self, line):
         tab_headers = ""
         tab_contents = ""
-        for tab in tab_recollector.with_tabs(line):
+        for index, tab in tab_recollector.with_tabs(line):
             token = reader.match(tab['content'])
             tab_node = parser.generate_node(token)
+            tab_node['active_class'] = ''
+            if index == 0:
+                tab_node['active_class'] = 'active'
             tab_headers += self.compiler.header_output(tab_node, token['options'])
             tab_contents += self.compiler.content_output(tab_node, token['options'])
             tab_html = self.compiler.compile(tab_headers, tab_contents)
             yield tab_html
 
     def _get_html_group_one_tab(self, line):
-        for tab in tab_recollector.with_tabs(line):
+        for index, tab in tab_recollector.with_tabs(line):
             token = reader.match(tab['content'])
             tab_node = parser.generate_node(token)
+            tab_node['active_class'] = 'active'
             tab_html = self.compiler.compile_one_tab(tab_node, token['options'])
             yield tab_html
 
@@ -88,7 +82,14 @@ class FriendlyFencedTabsExtension(Extension):
     def __init__(self, *args, **kwargs):
         #Defining the config options and defaults
         self.config = {
-            'single_block_as_tab': [False, 'Enable single_block_as_tab']
+            'single_block_as_tab'       : [False, 'Enable single_block_as_tab'],
+            'active_class'              : ['active', 'css class name to the active tab'],
+            'template_container'        : [ Utils.get_str_from_content('template/default_container.html') , 'template for container tabs'],
+            'template_header_container' : [ Utils.get_str_from_content('template/default_header_container.html'), 'template for container headers' ],
+            'template_header_item'      : [ Utils.get_str_from_content('template/default_header_item.html'), 'template for header item' ],
+            'template_content_container': [ Utils.get_str_from_content('template/default_content_container.html'), 'template for container the content section' ],
+            'template_content_item'     : [ Utils.get_str_from_content('template/default_content_item.html'), 'template for content body' ],
+            'template_block_no_tab'     : [ Utils.get_str_from_content('template/default_block_no_tab.html'), 'template for blocks with no tab style' ]
         }
         #Call the parent class's __init__ method to configure options
         super(FriendlyFencedTabsExtension, self).__init__(*args, **kwargs)

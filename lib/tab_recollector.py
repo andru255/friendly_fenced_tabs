@@ -68,8 +68,8 @@ class TabRecollector(object):
         return output
 
     def with_tabs(self, group):
-        for tab in group:
-            yield tab
+        for index, tab in enumerate(group):
+            yield index, tab
 
     def _remove_whitespaces(self, lines):
         return list(filter(lambda line: line != u'', lines))

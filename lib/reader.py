@@ -32,7 +32,7 @@ class Reader(object):
         result = None
         str_regex = r'''
             (?P<fence>^(?:~{3,}|`{3,}))[ ]*
-            (\{?\.?(?P<language>[\w#.+-]+)[^\w\=])?
+            (\{?\.?(?P<language>[\w#.+-\\!]+)[^\w\=])?
         '''
         clean_content = self._filter_content(content)
         block_regex = re.compile(str_regex, re.VERBOSE)
@@ -59,7 +59,7 @@ class Reader(object):
              # Opening ``` or ~~~
             (?P<fence>^(?:~{3,}|`{3,}))[ ]*
              # Optional {, and lang
-            (\{?\.?[\w#.+-]*)?[ ]*
+            (\{?\.?[\w#.+-\\!\\/]*)?[ ]*
              # options
             (\w*=(?P<fct_quot>[ "|' ]?).*?(?P=fct_quot))?[ ]*
             \}?[ ]*\n

@@ -27,11 +27,17 @@ class Compiler(object):
             if value_hl_lines:
                 hl_lines = value_hl_lines
 
+            css_class = codehilite_config['css_class'][0]
+            if tab_node['active_class']:
+                css_class = "{} {}".format(
+                    codehilite_config['css_class'][0],
+                    tab_node['active_class']) 
+
             highlighter =  self.extensions['Codehilite'](
                 tab_node['code'],
                 linenums=codehilite_config['linenums'][0],
                 guess_lang=codehilite_config['guess_lang'][0],
-                css_class=codehilite_config['css_class'][0],
+                css_class=css_class,
                 style=codehilite_config['pygments_style'][0],
                 lang=(tab_node['language'] or None),
                 noclasses=codehilite_config['noclasses'][0],
