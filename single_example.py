@@ -11,14 +11,14 @@ from markdown.extensions.codehilite import CodeHilite, CodeHiliteExtension
 
 from utils import Utils
 cwd = Utils.get_current_path()
-text_main = Utils.get_str_from_content('tests/fixtures/block-default.md', cwd)
+text_main = Utils.get_str_from_content('tests/fixtures/block-mixed-002.md', cwd)
 
 # main
 output = markdown.markdown(text_main,
                            extensions=['extension:FriendlyFencedTabsExtension', 'markdown.extensions.codehilite:CodeHiliteExtension'],
                            extension_configs = {
                                'extension:FriendlyFencedTabsExtension': {
-                                   'single_block_as_tab': True
+                                   'single_block_as_tab': False
                                },
                                'markdown.extensions.codehilite:CodeHiliteExtension': {
                                    'linenums': True

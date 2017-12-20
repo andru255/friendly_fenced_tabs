@@ -7,6 +7,8 @@ Fenced code tabs extension for python markdown
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+from jinja2 import Template
+
 from markdown.extensions import Extension
 from markdown.preprocessors import Preprocessor
 
@@ -16,15 +18,20 @@ from markdown.extensions.codehilite import parse_hl_lines
 import lib
 from utils import Utils
 
-reader = lib.Reader()
-parser = lib.Parser()
-tab_recollector = lib.TabRecollector()
+READER = lib.Reader()
+PARSER = lib.Parser()
+TAB_RECOLLECTOR = lib.TabRecollector()
 
 class FriendlyPreprocessor(Preprocessor):
     '''
     Class for process content from markdown
     '''
     def __init__(self, md, extension_config=None):
+        #setting the template
+        str_template = extension_config['template']
+        self.template = Template(str_template)
+
+        #setting the compiler
         self.compiler = lib.Compiler(extension_config, extra_extensions={
             'Codehilite'     : CodeHilite,
             'parse_hl_lines' : parse_hl_lines
@@ -38,25 +45,25 @@ class FriendlyPreprocessor(Preprocessor):
                break
 
     def _get_html_group_tabs(self, line):
-        tab_headers = ""
-        tab_contents = ""
-        for index, tab in tab_recollector.with_tabs(line):
-            token = reader.match(tab['content'])
-            tab_node = parser.generate_node(token)
+        headers = []
+        contents = []
+
+        for index, tab in TAB_RECOLLECTOR.with_tabs(line):
+            token = READER.match(tab['content'])
+            tab_node = PARSER.generate_node(token)
             tab_node['active_class'] = ''
             if index == 0:
                 tab_node['active_class'] = 'active'
-            tab_headers += self.compiler.header_output(tab_node, token['options'])
-            tab_contents += self.compiler.content_output(tab_node, token['options'])
-            tab_html = self.compiler.compile(tab_headers, tab_contents)
-            yield tab_html
 
-    def _get_html_group_one_tab(self, line):
-        for index, tab in tab_recollector.with_tabs(line):
-            token = reader.match(tab['content'])
-            tab_node = parser.generate_node(token)
-            tab_node['active_class'] = 'active'
-            tab_html = self.compiler.compile_one_tab(tab_node, token['options'])
+            headers.append(self.compiler.header_output(tab_node, token['options']))
+            contents.append(self.compiler.content_output(tab_node, token['options']))
+
+            tab_html = self.template.render(
+                group = tab['group'],
+                friendly_config= self.compiler.settings,
+                headers=headers,
+                contents=contents
+            )
             yield tab_html
 
     def run(self, lines):
@@ -65,17 +72,12 @@ class FriendlyPreprocessor(Preprocessor):
             self.compiler.update_settings('codehilite_config', config)
 
         #preprocessing the lines
-        lines_with_tabs = tab_recollector.get_lines_with_tabs(lines, reader)
+        lines_with_tabs = TAB_RECOLLECTOR.get_lines_with_tabs(lines, READER)
         for index, line in enumerate( lines_with_tabs ):
             if isinstance( line , list):
-                #if found a group of one tab
-                if len(line) == 1:
-                    for tab_html in self._get_html_group_one_tab(line):
-                       lines_with_tabs[index] = self.markdown.htmlStash.store(tab_html, safe=True)
-                #if found a group of more than one tab
-                else:
-                    for tab_html in self._get_html_group_tabs(line):
-                        lines_with_tabs[ index ] = self.markdown.htmlStash.store(tab_html, safe=True) 
+                for tab_html in self._get_html_group_tabs(line):
+                    lines_with_tabs[ index ] = self.markdown.htmlStash.store(tab_html, safe=True) 
+
         return lines_with_tabs
 
 class FriendlyFencedTabsExtension(Extension):
@@ -84,12 +86,7 @@ class FriendlyFencedTabsExtension(Extension):
         self.config = {
             'single_block_as_tab'       : [False, 'Enable single_block_as_tab'],
             'active_class'              : ['active', 'css class name to the active tab'],
-            'template_container'        : [ Utils.get_str_from_content('template/default_container.html') , 'template for container tabs'],
-            'template_header_container' : [ Utils.get_str_from_content('template/default_header_container.html'), 'template for container headers' ],
-            'template_header_item'      : [ Utils.get_str_from_content('template/default_header_item.html'), 'template for header item' ],
-            'template_content_container': [ Utils.get_str_from_content('template/default_content_container.html'), 'template for container the content section' ],
-            'template_content_item'     : [ Utils.get_str_from_content('template/default_content_item.html'), 'template for content body' ],
-            'template_block_no_tab'     : [ Utils.get_str_from_content('template/default_block_no_tab.html'), 'template for blocks with no tab style' ]
+            'template'                  : [ Utils.get_str_from_content('template.html') , 'template for container tabs on jinja syntax'],
         }
         #Call the parent class's __init__ method to configure options
         super(FriendlyFencedTabsExtension, self).__init__(*args, **kwargs)

@@ -1,0 +1,32 @@
+{% macro friendly_tabs(headers, contents) -%}
+<div class="friendly-tabs group-{{ group }}">
+    <!-- start headers -->
+    <ul class="headers">
+        {% for header in headers %}
+        <li class="header-{{ group }}-{{ loop.index0 }} {{ header.active_class }}">{{ header.title }}</li>
+        {% endfor %}
+    </ul>
+    <!-- end headers -->
+    <!-- start contents -->
+    <div class="contents">
+        {% for content in contents %}
+        <div class="content-{{ group }}-{{ loop.index0 }} contents_item {{ content.active_class }}">
+            <code>{{ content.code }}</code>
+        </div>
+        {% endfor %}
+    </div>
+    <!-- end contents -->
+</div>
+{%- endmacro %}
+
+{% if headers|length > 1 %}
+   {{ friendly_tabs(headers, contents) }}
+{% else %}
+    {% if friendly_config.single_block_as_tab %}
+        {{ friendly_tabs(headers, contents) }}
+    {% else %}
+        {% for content in contents %}
+            <code>{{ content.code }}</code>
+        {% endfor %}
+    {% endif %}
+{% endif %}
