@@ -1,3 +1,3 @@
 # Friendly Fenced Tabs
 
-Work in progress
+Work in progresssudo pip install . --upgrade
