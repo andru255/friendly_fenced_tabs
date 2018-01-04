@@ -19,8 +19,8 @@ from .reader import Reader
 from .parser import Parser
 from .tab_recollector import TabRecollector
 from .compiler import Compiler
-
-from utils import Utils
+from .utils import Utils
+import os
 
 READER = Reader()
 PARSER = Parser()
@@ -86,11 +86,12 @@ class FriendlyPreprocessor(Preprocessor):
 
 class FriendlyFencedTabsExtension(Extension):
     def __init__(self, *args, **kwargs):
+        current_path = os.path.dirname(__file__)
         #Defining the config options and defaults
         self.config = {
             'single_block_as_tab'       : [False, 'Enable single_block_as_tab'],
             'active_class'              : ['active', 'css class name to the active tab'],
-            'template'                  : [ Utils.get_str_from_content('template.html') , 'template for container tabs on jinja syntax'],
+            'template'                  : [ Utils.get_str_from_content('template.html', current_path), 'template for container tabs on jinja syntax'],
         }
         #Call the parent class's __init__ method to configure options
         super(FriendlyFencedTabsExtension, self).__init__(*args, **kwargs)
@@ -105,6 +106,9 @@ class FriendlyFencedTabsExtension(Extension):
         self.setConfig('single_block_as_tab', self.to_bool(
             self.getConfig('single_block_as_tab')
         ))
+        template_file = self.getConfig('template')
+        self.setConfig('template', Utils.get_str_from_content(template_file))
+
         md.registerExtension(self)
         md.preprocessors.add('fenced_code_block', 
           FriendlyPreprocessor(md, self.getConfigs()),

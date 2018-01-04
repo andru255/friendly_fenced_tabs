@@ -3,7 +3,7 @@
 
 import re
 from datetime import datetime
-from utils import Utils
+from .utils import Utils
 
 class Parser(object):
     def generate_node(self, token):

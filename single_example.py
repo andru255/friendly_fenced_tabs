@@ -9,7 +9,7 @@ import markdown
 from friendly_fenced_tabs import FriendlyFencedTabsExtension
 from markdown.extensions.codehilite import CodeHilite, CodeHiliteExtension
 
-from utils import Utils
+from friendly_fenced_tabs import Utils
 cwd = Utils.get_current_path()
 text_main = Utils.get_str_from_content('tests/fixtures/block-mixed-002.md', cwd)
 

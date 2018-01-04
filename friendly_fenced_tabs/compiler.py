@@ -1,4 +1,4 @@
-from utils import Utils
+from .utils import Utils
 
 class Compiler(object):
     def __init__(self, settings, extra_extensions):
