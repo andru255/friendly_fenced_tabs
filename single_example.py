@@ -6,7 +6,7 @@ A litle demo to use friendly_fenced_tabs
 """
 
 import markdown
-from extension import FriendlyFencedTabsExtension
+from friendly_fenced_tabs import FriendlyFencedTabsExtension
 from markdown.extensions.codehilite import CodeHilite, CodeHiliteExtension
 
 from utils import Utils
@@ -15,9 +15,9 @@ text_main = Utils.get_str_from_content('tests/fixtures/block-mixed-002.md', cwd)
 
 # main
 output = markdown.markdown(text_main,
-                           extensions=['extension:FriendlyFencedTabsExtension', 'markdown.extensions.codehilite:CodeHiliteExtension'],
+                           extensions=['friendly_fenced_tabs:FriendlyFencedTabsExtension', 'markdown.extensions.codehilite:CodeHiliteExtension'],
                            extension_configs = {
-                               'extension:FriendlyFencedTabsExtension': {
+                               'friendly_fenced_tabs:FriendlyFencedTabsExtension': {
                                    'single_block_as_tab': False
                                },
                                'markdown.extensions.codehilite:CodeHiliteExtension': {

@@ -1,11 +1,10 @@
-from setuptools import setup, find_packages
+from setuptools import setup
 
 setup(
     name='friendly_fenced_tabs',
     version='0.0.9',
     url='https://github.com/andru255/friendly_fenced_tabs',
-    py_modules=['friendly_fenced_tabs'],
-    packages=find_packages(exclude=['contrib', 'docs', 'tests']),
+    packages=['friendly_fenced_tabs'],
     package_dir= {'friendly_fenced_tabs.lib': 'lib'},
     install_requires=[
         'markdown>=2.6'

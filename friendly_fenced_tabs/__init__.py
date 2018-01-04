@@ -15,12 +15,16 @@ from markdown.preprocessors import Preprocessor
 from markdown.extensions.codehilite import CodeHilite, CodeHiliteExtension
 from markdown.extensions.codehilite import parse_hl_lines
 
-import lib
+from .reader import Reader
+from .parser import Parser
+from .tab_recollector import TabRecollector
+from .compiler import Compiler
+
 from utils import Utils
 
-READER = lib.Reader()
-PARSER = lib.Parser()
-TAB_RECOLLECTOR = lib.TabRecollector()
+READER = Reader()
+PARSER = Parser()
+TAB_RECOLLECTOR = TabRecollector()
 
 class FriendlyPreprocessor(Preprocessor):
     '''
@@ -32,7 +36,7 @@ class FriendlyPreprocessor(Preprocessor):
         self.template = Template(str_template)
 
         #setting the compiler
-        self.compiler = lib.Compiler(extension_config, extra_extensions={
+        self.compiler = Compiler(extension_config, extra_extensions={
             'Codehilite'     : CodeHilite,
             'parse_hl_lines' : parse_hl_lines
         })

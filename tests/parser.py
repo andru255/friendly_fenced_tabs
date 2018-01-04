@@ -1,8 +1,8 @@
-import lib
+from friendly_fenced_tabs import Parser
 import unittest
 from utils import Utils
 
-parser = lib.Parser()
+parser = Parser()
 class TestParser(unittest.TestCase):
     def setUp(self):
         "nothing here at the moment"

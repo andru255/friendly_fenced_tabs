@@ -1,8 +1,8 @@
-import lib
+from friendly_fenced_tabs import Reader
 import unittest
 from utils import Utils
 
-objReader = lib.Reader()
+objReader = Reader()
 class TestReader(unittest.TestCase):
     def setUp(self):
         "nothing here at the moment"
