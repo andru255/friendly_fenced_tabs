@@ -87,11 +87,12 @@ class FriendlyPreprocessor(Preprocessor):
 class FriendlyFencedTabsExtension(Extension):
     def __init__(self, *args, **kwargs):
         current_path = os.path.dirname(__file__)
+        default_template = "{}/{}".format(current_path, 'template.html')
         #Defining the config options and defaults
         self.config = {
             'single_block_as_tab'       : [False, 'Enable single_block_as_tab'],
             'active_class'              : ['active', 'css class name to the active tab'],
-            'template'                  : [ Utils.get_str_from_content('template.html', current_path), 'template for container tabs on jinja syntax'],
+            'template'                  : [default_template, 'template for container tabs on jinja syntax'],
         }
         #Call the parent class's __init__ method to configure options
         super(FriendlyFencedTabsExtension, self).__init__(*args, **kwargs)
@@ -114,5 +115,12 @@ class FriendlyFencedTabsExtension(Extension):
           FriendlyPreprocessor(md, self.getConfigs()),
           '>normalize_whitespace')
 
-    def makeExtension(*args, **kwargs):
-        return FriendlyFencedTabsExtension(*args, **kwargs)
+    # important to register our extension
+    # if invoke makeExtension func into this class, friendly_fenced_tabs:FriendlyFencedTabsExtensions is register
+    #def makeExtension(*args, **kwargs):
+    #    return FriendlyFencedTabsExtension(*args, **kwargs)
+
+# important to register our extension
+# if invoke makeExtension func directly, friendly_fenced_tabs register directly
+def makeExtension(*args, **kwargs):
+    return FriendlyFencedTabsExtension(*args, **kwargs)
