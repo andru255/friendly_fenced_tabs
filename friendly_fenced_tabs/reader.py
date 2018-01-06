@@ -32,13 +32,15 @@ class Reader(object):
         result = None
         str_regex = r'''
             (?P<fence>^(?:~{3,}|`{3,}))[ ]*
-            (\{?\.?(?P<language>[\w#.+-\\!]+)[^\w\=])?
+            (\{?\.?(?P<language>[\w#.\+\-\\!]+[^\w_\=]))?
         '''
         clean_content = self._filter_content(content)
         block_regex = re.compile(str_regex, re.VERBOSE)
         match = block_regex.search(clean_content)
         if match:
             result = match.groupdict()['language']
+            if result:
+                result = result.strip()
         return result
 
     def match_options(self, content):

@@ -1,6 +1,6 @@
 from friendly_fenced_tabs import Reader
 import unittest
-from utils import Utils
+from friendly_fenced_tabs.utils import Utils
 
 objReader = Reader()
 class TestReader(unittest.TestCase):
@@ -77,7 +77,7 @@ class TestReader(unittest.TestCase):
         expected ={
             'language': None,
             'options': [
-                {'key_name': u'hl_lines', 'quot': u'', 'value': u'1,2'}
+                {'key_name': u'hl_lines', 'quot': u'"', 'value': u'1,2'}
             ],
             'code': u'my example of block\nmy example of block again\n',
         }

@@ -1,6 +1,6 @@
 from friendly_fenced_tabs import Parser
 import unittest
-from utils import Utils
+from friendly_fenced_tabs.utils import Utils
 
 parser = Parser()
 class TestParser(unittest.TestCase):
@@ -12,15 +12,13 @@ class TestParser(unittest.TestCase):
         expected = {
             'title': 'Untitled',
             'code': u'my example of block\n',
-            'language': u'',
+            'language': None,
             'slug': 'untitled',
         }
         match = {
-            'fct_quot': None,
+            'language': None,
+            'options': [],
             'code': u'my example of block\n',
-            'friendly_title': None,
-            'fence': u'```',
-            'language': u''
         }
         node = parser.generate_node(match)
         self.assertEqual(node, expected)
@@ -29,15 +27,32 @@ class TestParser(unittest.TestCase):
         expected = {
             'title': u'My custom title',
             'code': u'my example of block\n',
-            'language': u'',
+            'language': None,
             'slug': u'my-custom-title'
         }
         match = {
-            'fct_quot': u'\'',
+            'language': None,
+            'options': [
+                { 'key_name': u'friendly_title',
+                'quot': u"'",
+                'value': u'My custom title' }
+            ],
             'code': u'my example of block\n',
-            'friendly_title': u'My custom title',
-            'fence': u'```',
-            'language': u''
+        }
+        node = parser.generate_node(match)
+        self.assertEqual(expected, node)
+
+    def test_Parser_get_node__blockwithlanguage(self):
+        expected = {
+            'title': u'Python',
+            'code': u'#code here\n',
+            'language': u'python',
+            'slug': u'python'
+        }
+        match = {
+            'language': u'python',
+            'options': [],
+            'code': u'#code here\n',
         }
         node = parser.generate_node(match)
         self.assertEqual(expected, node)
