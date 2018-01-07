@@ -62,9 +62,6 @@ class TabRecollector(object):
                     registered_groups.append(line['group'])
                 else:
                     output[index] = u''
-
-        #cleaning
-        #output = self._remove_whitespaces(output)
         return output
 
     def with_tabs(self, group):

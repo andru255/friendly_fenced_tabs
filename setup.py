@@ -6,7 +6,8 @@ setup(
     url='https://github.com/andru255/friendly_fenced_tabs',
     packages=['friendly_fenced_tabs', 'friendly_fenced_tabs/utils'],
     install_requires=[
-        'markdown>=2.6'
+        'markdown>=2.6',
+        'htmlmin>=0.1.12'
     ],
     include_package_data=True,
     description='Generates a html estructure for handling tabbed content',

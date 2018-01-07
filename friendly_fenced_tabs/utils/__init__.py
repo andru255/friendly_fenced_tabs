@@ -1,6 +1,6 @@
 import os
 
-class Utils:
+class Utils(object):
     @staticmethod
     def get_str_from_content(file_path, base_path=''):
         pwd = Utils.get_current_path()
@@ -16,7 +16,7 @@ class Utils:
     def get_current_path():
         current_path = os.getcwd()
         return current_path
-    
+
     @staticmethod
     def get_value_by_key_name(dict_options, key_name):
         result = ""

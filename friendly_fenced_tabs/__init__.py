@@ -7,6 +7,7 @@ Fenced code tabs extension for python markdown
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+from htmlmin import minify
 from jinja2 import Template
 
 from markdown.extensions import Extension
@@ -33,7 +34,9 @@ class FriendlyPreprocessor(Preprocessor):
     def __init__(self, md, extension_config=None):
         #setting the template
         str_template = extension_config['template']
-        self.template = Template(str_template)
+        self.template = Template(str_template, trim_blocks=True, lstrip_blocks=True)
+        #getting the active_class from config
+        self.active_class = extension_config['active_class']
 
         #setting the compiler
         self.compiler = Compiler(extension_config, extra_extensions={
@@ -57,7 +60,7 @@ class FriendlyPreprocessor(Preprocessor):
             tab_node = PARSER.generate_node(token)
             tab_node['active_class'] = ''
             if index == 0:
-                tab_node['active_class'] = 'active'
+                tab_node['active_class'] = self.active_class
 
             headers.append(self.compiler.header_output(tab_node, token['options']))
             contents.append(self.compiler.content_output(tab_node, token['options']))
@@ -77,11 +80,11 @@ class FriendlyPreprocessor(Preprocessor):
 
         #preprocessing the lines
         lines_with_tabs = TAB_RECOLLECTOR.get_lines_with_tabs(lines, READER)
-        for index, line in enumerate( lines_with_tabs ):
-            if isinstance( line , list):
+        for index, line in enumerate(lines_with_tabs):
+            if isinstance(line, list):
                 for tab_html in self._get_html_group_tabs(line):
-                    lines_with_tabs[ index ] = self.markdown.htmlStash.store(tab_html, safe=True) 
-
+                    trimed_html = minify(tab_html.decode("utf-8"), remove_empty_space=True, remove_comments=True)
+                    lines_with_tabs[index] = self.markdown.htmlStash.store(trimed_html, safe=True) 
         return lines_with_tabs
 
 class FriendlyFencedTabsExtension(Extension):
@@ -92,7 +95,7 @@ class FriendlyFencedTabsExtension(Extension):
         self.config = {
             'single_block_as_tab'       : [False, 'Enable single_block_as_tab'],
             'active_class'              : ['active', 'css class name to the active tab'],
-            'template'                  : [default_template, 'template for container tabs on jinja syntax'],
+            'template'                  : [default_template, 'template for tabs on jinja syntax']
         }
         #Call the parent class's __init__ method to configure options
         super(FriendlyFencedTabsExtension, self).__init__(*args, **kwargs)

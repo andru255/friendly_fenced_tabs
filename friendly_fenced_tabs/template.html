@@ -1,17 +1,19 @@
 {% macro friendly_tabs(headers, contents) -%}
 <div class="friendly-tabs group-{{ group }}">
     <!-- start headers -->
-    <ul class="headers">
+    <ul class="nav nav-tabs">
         {% for header in headers %}
-        <li class="header-{{ group }}-{{ loop.index0 }} {{ header.active_class }}">{{ header.title }}</li>
+        <li role="presentation" class="header-{{ group }}-{{ loop.index0 }} {{ header.active_class }}">
+            <a href="#content-{{ group}}-{{ loop.index0 }}" data-toggle="tab">{{ header.title }}</a>
+        </li>
         {% endfor %}
     </ul>
     <!-- end headers -->
     <!-- start contents -->
-    <div class="contents">
+    <div class="tab-content">
         {% for content in contents %}
-        <div class="content-{{ group }}-{{ loop.index0 }} contents_item {{ content.active_class }}">
-            <code>{{ content.code }}</code>
+        <div id="content-{{ group }}-{{ loop.index0 }}" class="tab-pane contents_item {{ content.active_class }}">
+            <pre><code>{{ content.code }}</code></pre>
         </div>
         {% endfor %}
     </div>
@@ -26,7 +28,8 @@
         {{ friendly_tabs(headers, contents) }}
     {% else %}
         {% for content in contents %}
-            <code>{{ content.code }}</code>
+            <pre><code>{{ content.code }}</code></pre>
         {% endfor %}
     {% endif %}
 {% endif %}
+
