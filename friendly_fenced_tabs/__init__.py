@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 """
 Fenced code tabs extension for python markdown
@@ -7,6 +8,7 @@ Fenced code tabs extension for python markdown
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+import os
 from htmlmin import minify
 from jinja2 import Template
 
@@ -21,7 +23,6 @@ from .parser import Parser
 from .tab_recollector import TabRecollector
 from .compiler import Compiler
 from .utils import Utils
-import os
 
 READER = Reader()
 PARSER = Parser()
@@ -66,8 +67,8 @@ class FriendlyPreprocessor(Preprocessor):
             contents.append(self.compiler.content_output(tab_node, token['options']))
 
             tab_html = self.template.render(
-                group = tab['group'],
-                friendly_config= self.compiler.settings,
+                group=tab['group'],
+                friendly_config=self.compiler.settings,
                 headers=headers,
                 contents=contents
             )
@@ -83,8 +84,10 @@ class FriendlyPreprocessor(Preprocessor):
         for index, line in enumerate(lines_with_tabs):
             if isinstance(line, list):
                 for tab_html in self._get_html_group_tabs(line):
-                    trimed_html = minify(tab_html.decode("utf-8"), remove_empty_space=True, remove_comments=True)
-                    lines_with_tabs[index] = self.markdown.htmlStash.store(trimed_html, safe=True) 
+                    trimed_html = minify(tab_html.decode("utf-8"),
+                                         remove_empty_space=True,
+                                         remove_comments=True)
+                    lines_with_tabs[index] = self.markdown.htmlStash.store(trimed_html, safe=True)
         return lines_with_tabs
 
 class FriendlyFencedTabsExtension(Extension):
@@ -114,12 +117,13 @@ class FriendlyFencedTabsExtension(Extension):
         self.setConfig('template', Utils.get_str_from_content(template_file))
 
         md.registerExtension(self)
-        md.preprocessors.add('fenced_code_block', 
-          FriendlyPreprocessor(md, self.getConfigs()),
-          '>normalize_whitespace')
+        md.preprocessors.add('fenced_code_block',
+                             FriendlyPreprocessor(md, self.getConfigs()),
+                             '>normalize_whitespace')
 
     # important to register our extension
-    # if invoke makeExtension func into this class, friendly_fenced_tabs:FriendlyFencedTabsExtensions is register
+    # if invoke makeExtension func into this class,
+    # friendly_fenced_tabs:FriendlyFencedTabsExtensions is register
     #def makeExtension(*args, **kwargs):
     #    return FriendlyFencedTabsExtension(*args, **kwargs)
 

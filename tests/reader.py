@@ -27,17 +27,6 @@ class TestReader(unittest.TestCase):
         fixture = Utils.get_str_from_content('tests/fixtures/block-below.md')
         result_match = objReader.match(fixture)
         self.assertEqual(result_match, expected)
-    
-    @unittest.skip("TODO: friendly_attrs")
-    def test_Reader_match__customwrapper(self):
-        expected = {
-            'language': None,
-            'options': [],
-            'code': u'my block below\n'
-        }
-        fixture = Utils.get_str_from_content('tests/fixtures/block-custom-wrapper.md')
-        result_match = objReader.match(fixture)
-        self.assertEqual(result_match, expected)
 
     def test_Reader_match__block(self):
         expected = {
@@ -63,9 +52,9 @@ class TestReader(unittest.TestCase):
         expected = {
             'language': None,
             'options': [
-                { 'key_name': u'friendly_title',
-                'quot': u"'",
-                'value': u'My custom title' }
+                {'key_name': u'friendly_title',
+                 'quot': u"'",
+                 'value': u'My custom title'}
             ],
             'code': u'my example of block\n',
         }
@@ -74,7 +63,7 @@ class TestReader(unittest.TestCase):
         self.assertEqual(result_match, expected)
 
     def test_Reader_match__blockwithhllines(self):
-        expected ={
+        expected = {
             'language': None,
             'options': [
                 {'key_name': u'hl_lines', 'quot': u'"', 'value': u'1,2'}

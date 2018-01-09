@@ -1,8 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import re
-from datetime import datetime
+'''
+    This class returns a readable node
+    ready to compile them
+'''
 from .utils import Utils
 
 class Parser(object):
@@ -19,11 +21,11 @@ class Parser(object):
         friendly_title = Utils.get_value_by_key_name(options, 'friendly_title')
         if friendly_title:
             title = friendly_title
-        
+
         # body scaped content
         code = token['code']
         scaped_body = self._escape(code)
-        title_value =  self._format_title(title)
+        title_value = self._format_title(title)
 
         data = {
             "title": title_value,
@@ -32,7 +34,7 @@ class Parser(object):
             "slug": self._hypenize(title_value)
         }
         return data
-    
+
     def _format_title(self, value):
         capitalized = value.capitalize()
         formated_title = capitalized.replace('-', ' ')

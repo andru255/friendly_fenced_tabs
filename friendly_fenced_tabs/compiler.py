@@ -10,7 +10,7 @@ class Compiler(object):
 
     def header_output(self, tab_node, tab_options):
         output = tab_node.copy()
-        output['options']= tab_options
+        output['options'] = tab_options
         return output
 
     def content_output(self, tab_node, tab_options):
@@ -29,9 +29,9 @@ class Compiler(object):
             if tab_node['active_class']:
                 css_class = "{} {}".format(
                     codehilite_config['css_class'][0],
-                    tab_node['active_class']) 
+                    tab_node['active_class'])
 
-            highlighter =  self.extensions['Codehilite'](
+            highlighter = self.extensions['Codehilite'](
                 tab_node['code'],
                 linenums=codehilite_config['linenums'][0],
                 guess_lang=codehilite_config['guess_lang'][0],
@@ -40,7 +40,7 @@ class Compiler(object):
                 lang=(tab_node['language'] or None),
                 noclasses=codehilite_config['noclasses'][0],
                 hl_lines=self.extensions['parse_hl_lines'](hl_lines)
-            ) 
+            )
             tab_node['code'] = highlighter.hilite()
 
         output = tab_node.copy()

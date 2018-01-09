@@ -16,7 +16,7 @@ text_main = Utils.get_str_from_content('tests/fixtures/block-mixed-001.md', cwd)
 # main
 output = markdown.markdown(text_main,
                            extensions=['friendly_fenced_tabs'],
-                           extension_configs = {
+                           extension_configs={
                                'friendly_fenced_tabs': {
                                    'single_block_as_tab': False
                                }

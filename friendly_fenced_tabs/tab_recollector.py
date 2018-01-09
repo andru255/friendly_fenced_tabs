@@ -1,3 +1,12 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+'''
+    This class focus for reorder the array data output
+    that gives markdown and insert with useful data
+    to read&parse the tabs
+'''
+
 class TabRecollector(object):
     def __init__(self):
         pass

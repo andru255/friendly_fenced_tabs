@@ -1,3 +1,9 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+"""
+    Miscelaneous functions
+"""
 import os
 
 class Utils(object):

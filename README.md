@@ -5,9 +5,6 @@ Inspired entirely on [ @yacir repo ](https://github.com/yacir/markdown-fenced-co
 # Documentation
 You can see the settings and stuff offered in the mkdocs demo (WIP)
 
-# Easy Installation
-WIP
-
 # Manual installation
 
 Clone it, go to the folder by terminal and execute:
