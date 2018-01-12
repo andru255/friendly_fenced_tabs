@@ -5,8 +5,23 @@
 Inspired entirely on [ @yacir repo ](https://github.com/yacir/markdown-fenced-code-tabs) for grouping and show a better code documented.
 
 
+# Pip installation
+
+The recommended way:
+
+~ pip install friendly_fenced_tabs
+
+# Integrate with mkdocs
+
+```
+markdown_extensions:
+    -friendly_fenced_tabs:
+        single_block_as_tab: True
+```
+
 
 # Documentation
+
 You can see the settings and stuff offered in the mkdocs demo (WIP)
 
 # Manual installation
