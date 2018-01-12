@@ -18,7 +18,6 @@ setup(
     long_description=""" Markdown extension who generates HTML tabs by fenced code block markdown syntax """,
     zip_safe=False,
     classifiers=[
-        'Intented Audience :: Developers',
         'License :: OSI Approved :: MIT License',
         'Operating System :: OS Independent',
         'Programming Language :: Python',
