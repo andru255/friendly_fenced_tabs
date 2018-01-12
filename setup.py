@@ -15,7 +15,6 @@ setup(
     author_email='andru255@gmail.com',
     license='MIT',
     keywords=['fenced code blocks', 'code', 'fenced', 'tabs', 'mkdocs', 'markdown'],
-    platform='Operating System :: OS Independent',
     long_description=""" Markdown extension who generates HTML tabs by fenced code block markdown syntax """,
     zip_safe=False,
     classifiers=[
