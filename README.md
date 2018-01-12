@@ -1,6 +1,10 @@
+![Fred tab jr](fred_tab_jr.png)
+
 # Friendly Fenced Tabs
 
 Inspired entirely on [ @yacir repo ](https://github.com/yacir/markdown-fenced-code-tabs) for grouping and show a better code documented.
+
+
 
 # Documentation
 You can see the settings and stuff offered in the mkdocs demo (WIP)
