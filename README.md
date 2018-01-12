@@ -9,7 +9,9 @@ Inspired entirely on [ @yacir repo ](https://github.com/yacir/markdown-fenced-co
 
 The recommended way:
 
+```
 ~ pip install friendly_fenced_tabs
+```
 
 ## Integrate with mkdocs
 
@@ -28,7 +30,9 @@ You can see the settings and stuff offered in the mkdocs demo (WIP)
 
 Clone it, go to the folder by terminal and execute:
 
+```
 ~ sudo pip install . --upgrade
+```
 
 ## Credits / Thanks to
 
