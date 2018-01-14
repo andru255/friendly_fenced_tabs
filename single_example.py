@@ -11,7 +11,7 @@ from markdown.extensions.codehilite import CodeHilite, CodeHiliteExtension
 
 from friendly_fenced_tabs import Utils
 cwd = Utils.get_current_path()
-text_main = Utils.get_str_from_content('tests/fixtures/block-mixed-001.md', cwd)
+text_main = Utils.get_str_from_content('tests/fixtures/block-mixed-003.md', cwd)
 
 # main
 output = markdown.markdown(text_main,

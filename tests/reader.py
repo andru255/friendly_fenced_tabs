@@ -112,3 +112,13 @@ class TestReader(unittest.TestCase):
         fixture = Utils.get_str_from_content('tests/fixtures/block-with-title-and-hl_lines.md')
         result_match = objReader.match(fixture)
         self.assertEqual(result_match, expected)
+
+    def test_Reader_match_mixed003(self):
+        expected = {
+            'language': None,
+            'options': [],
+            'code': u'  //single block\n'
+        }
+        fixture = Utils.get_str_from_content('tests/fixtures/block-mixed-003.md')
+        result_match = objReader.match(fixture)
+        self.assertEqual(result_match, expected)

@@ -12,14 +12,13 @@ class TabRecollector(object):
         pass
 
     def get_lines_with_tabs(self, lines, reader_obj):
-        cleaned_lines = self._remove_whitespaces(lines)
         lines_to_buffer = []
         tab_meta = {}
         opened_fenced_expr = False
         last_founded = {}
         group = 0
 
-        for index, line in enumerate(cleaned_lines):
+        for index, line in enumerate(lines):
             match = reader_obj.match_fenced_symbol(line)
             if match:
                 # check if is opened
@@ -37,7 +36,7 @@ class TabRecollector(object):
                     tab_meta['content'] += line
 
                     # grouping
-                    if self._tab_is_sibling(last_founded, tab_meta):
+                    if self._tab_is_sibling(lines, last_founded, tab_meta):
                         tab_meta['group'] = last_founded['group']
                     else:
                         tab_meta['group'] = group
@@ -64,13 +63,14 @@ class TabRecollector(object):
         output = lines_to_buffer[:]
         registered_groups = []
         for index, line in enumerate(lines_to_buffer):
-            if 'group' in line:
-                groups = self._filter_tab_groups(line['group'], lines_to_buffer)
-                if not line['group'] in registered_groups:
-                    output[index] = groups
-                    registered_groups.append(line['group'])
-                else:
-                    output[index] = u''
+            if isinstance(line, dict):
+                if 'group' in line:
+                    groups = self._filter_tab_groups(line['group'], lines_to_buffer)
+                    if not line['group'] in registered_groups:
+                        output[index] = groups
+                        registered_groups.append(line['group'])
+                    else:
+                        output[index] = u''
         return output
 
     def with_tabs(self, group):
@@ -80,7 +80,7 @@ class TabRecollector(object):
     def _remove_whitespaces(self, lines):
         return list(filter(lambda line: line != u'', lines))
 
-    def _tab_is_sibling(self, last_founded, meta_data):
+    def _tab_is_sibling(self, lines, last_founded, meta_data):
         last_index_end = 0
         current_start_index = 0
 
@@ -88,16 +88,25 @@ class TabRecollector(object):
             last_index_end = last_founded['end']
         if 'index_start' in meta_data:
             current_start_index = meta_data['index_start']
-
-        if last_index_end == current_start_index - 1:
-            return True
+        
+        if last_index_end != 0 and current_start_index != 0:
+            if self._is_only_whitespaces_in_range(lines, last_index_end + 1, current_start_index):
+                return True
 
         return False
+    
+    def _is_only_whitespaces_in_range(self, lines, index_start, index_end):
+        range_to_check = lines[index_start: index_end]
+        for line in range_to_check:
+            if line != u'':
+                return False
+        return True
 
     def _filter_tab_groups(self, group, lines):
         output = []
         for line in lines:
-            if 'group' in line:
-                if line['group'] == group:
-                    output.append(line)
+            if isinstance(line, dict):
+                if 'group' in line:
+                    if line['group'] == group:
+                        output.append(line)
         return output
