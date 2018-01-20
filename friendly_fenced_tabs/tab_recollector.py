@@ -6,79 +6,67 @@
     that gives markdown and insert with useful data
     to read&parse the tabs
 '''
+from utils import Utils
 
 class TabRecollector(object):
     def __init__(self):
         pass
 
-    def get_lines_with_tabs(self, lines, reader_obj):
-        lines_to_buffer = []
-        tab_meta = {}
-        opened_fenced_expr = False
-        last_founded = {}
-        group = 0
+    def get_lines_with_tabs(self, lines, reader_obj, tab_callback=None):
+        content = ''
+        output = []
+        fenced_code_founded = []
+        content_iterator = self._search_and_format(lines, reader_obj)
+        for current_match, last_match in content_iterator:
+            fenced_code_founded.append(current_match['line_found'])
 
         for index, line in enumerate(lines):
-            match = reader_obj.match_fenced_symbol(line)
-            if match:
-                # check if is opened
-                if opened_fenced_expr:
-                    # close the block founded
-                    tab_meta['index_end'] = index
-                    opened_fenced_expr = False
-                else:
-                    # open if is False
-                    opened_fenced_expr = True
-                    tab_meta['index_start'] = index
-
-                # append
-                if 'content' in tab_meta:
-                    tab_meta['content'] += line
-
-                    # grouping
-                    if self._tab_is_sibling(lines, last_founded, tab_meta):
-                        tab_meta['group'] = last_founded['group']
-                    else:
-                        tab_meta['group'] = group
-                        last_founded['group'] = tab_meta['group']
-                        group += 1
-                    # for new line and don't contains into a paragraph
-                    lines_to_buffer.append(u'\n')
-                    # adding the metadata
-                    lines_to_buffer.append(tab_meta)
-                    last_founded['start'] = tab_meta['index_start']
-                    last_founded['end'] = tab_meta['index_end']
-                    tab_meta = {}
-                else:
-                    tab_meta['content'] = '%s\n' % line
+            if index in fenced_code_founded:
+                output.insert(index, [ {"meta": "cool"} ])
             else:
-                if opened_fenced_expr:
-                    tab_meta['content'] += '%s\n' % line
-                else:
-                    lines_to_buffer.append(line)
-                    tab_meta = {}
-                    continue
+                output.append(line)
 
-        # sorting
-        output = lines_to_buffer[:]
-        registered_groups = []
-        for index, line in enumerate(lines_to_buffer):
-            if isinstance(line, dict):
-                if 'group' in line:
-                    groups = self._filter_tab_groups(line['group'], lines_to_buffer)
-                    if not line['group'] in registered_groups:
-                        output[index] = groups
-                        registered_groups.append(line['group'])
-                    else:
-                        output[index] = u''
+        print("output", output)
         return output
+
+    def _search_and_format(self, lines, reader_obj):
+        content = '\n'.join(lines)
+        last_match = None
+        while True:
+            match = reader_obj.match_code_content(content)
+            if match:
+                placeholder = '<friendly_fenced_tabs/>'
+                content_initial_start = "{}\n".format(
+                    content[:match.start()]
+                )
+                line_found = content_initial_start.split("\n")
+                num_line_found = len(line_found) - 1
+                current_match = {
+                    "match": match,
+                    "line_found": num_line_found
+                }
+                content = "{}\n{}\n{}".format(
+                    content[:match.start()],
+                    placeholder,
+                    content[match.end():]
+                )
+                yield current_match, last_match
+                last_match = current_match
+            else:
+                break
+
+    def wrapper_with_tab(self, match, last_found, content):
+        lines = content.split("\n")
+        if last_found:
+            print("LAST_FOUND", last_found.start(), last_found.end())
+        print("CURRENT", match.start(), match.end())
+        print("NUM_LINE_FOUND>>>>>", lines)
+        print("LINES>>>>>", lines)
+        return ":D"
 
     def with_tabs(self, group):
         for index, tab in enumerate(group):
             yield index, tab
-
-    def _remove_whitespaces(self, lines):
-        return list(filter(lambda line: line != u'', lines))
 
     def _tab_is_sibling(self, lines, last_founded, meta_data):
         last_index_end = 0
@@ -101,6 +89,21 @@ class TabRecollector(object):
             if line != u'':
                 return False
         return True
+
+    def _nothing_between_symbols(self, lines, last_founded, meta_data):
+        last_index_end = 0
+        current_start_index = 0
+        range = []
+
+        if 'end' in last_founded:
+            last_index_end = last_founded['end']
+        if 'index_start' in meta_data:
+            current_start_index = meta_data['index_start']
+
+        if last_index_end != 0 and current_start_index != 0:
+            range = lines[last_index_end+1: current_start_index]
+        print("range", range)
+        return True if len(range) == 0 else False
 
     def _filter_tab_groups(self, group, lines):
         output = []

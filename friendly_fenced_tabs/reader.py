@@ -13,7 +13,7 @@ class Reader(object):
         to assemble the final output
     '''
     def match_fenced_symbol(self, content):
-        clean_content = self._filter_content(content)
+        clean_content = self.filter_content(content)
         block_regex = re.compile(r'''
           (?P<fence>^(?:~{3,}|`{3,}))[ ]*
         ''', re.VERBOSE)
@@ -34,7 +34,7 @@ class Reader(object):
             (?P<fence>^(?:~{3,}|`{3,}))[ ]*
             (\{?\.?(?P<language>[\w#.\+\-\\!]+[^\w_\=]))?
         '''
-        clean_content = self._filter_content(content)
+        clean_content = self.filter_content(content)
         block_regex = re.compile(str_regex, re.VERBOSE)
         match = block_regex.search(clean_content)
         if match:
@@ -48,7 +48,7 @@ class Reader(object):
         str_regex = r'''
             (?P<key_name>\w*)=(?P<quot>['|"]?)(?P<value>[\w\d,\. ]+)?(?P=quot)[ ]?
         '''
-        clean_content = self._filter_content(content)
+        clean_content = self.filter_content(content)
         block_regex = re.compile(str_regex, re.VERBOSE)
         for match in re.finditer(block_regex, clean_content):
             if match:
@@ -68,14 +68,14 @@ class Reader(object):
             (?P<code>.*?)(?<=\n)
             (?P=fence)[ ]*$
         '''
-        clean_content = self._filter_content(content)
+        clean_content = self.filter_content(content)
         block_regex = re.compile(str_regex, re.MULTILINE| re.DOTALL | re.VERBOSE)
         match = block_regex.search(clean_content)
         if match:
-            result = match.groupdict()['code']
+            result = match
         return result
 
-    def _filter_content(self, content):
+    def filter_content(self, content):
         string_block = content.replace(u'\u2018', '&lsquo;') #‘
         string_block = string_block.replace(u'\u2019', '&rsquo;') #’
         string_block = string_block.replace(u'\u201c', '&ldquo;') #“

@@ -122,3 +122,13 @@ class TestReader(unittest.TestCase):
         fixture = Utils.get_str_from_content('tests/fixtures/block-mixed-003.md')
         result_match = objReader.match(fixture)
         self.assertEqual(result_match, expected)
+
+    def test_Reader_match_blocknested(self):
+        expected = {
+            'language': u'markdown',
+            'options': [],
+            'code': u'```\nmy example of block\n```\n'
+        }
+        fixture = Utils.get_str_from_content('tests/fixtures/block-nested-single.md')
+        result_match = objReader.match(fixture)
+        self.assertEqual(result_match, expected)
